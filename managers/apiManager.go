@@ -1,12 +1,14 @@
 package managers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/HugoJBello/task-manager-golang-ui/models"
+	"fmt"
 	"io/ioutil"
-	"bytes"
 	"net/http"
+
+	"github.com/HugoJBello/task-manager-golang-ui/models"
 )
 
 
@@ -30,6 +32,7 @@ func (m *ApiManager) GetBoards() (*[]models.Board, error){
 
 		currentUrl := m.Url + GetBoardRoute+"?limit=10&skip=0"
 
+		fmt.Println(currentUrl)
 		
 		resp, err := http.Get(currentUrl)
 	
