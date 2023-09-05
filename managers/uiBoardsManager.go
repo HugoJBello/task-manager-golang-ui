@@ -9,12 +9,14 @@ type UiBoardsManager struct {
 }
 
 func (m *UiBoardsManager) GetBoardsListUi(boards *[]models.Board, app *tview.Application, globalAppState *models.GlobalAppState, updatedSelectedBoard *chan string) (*tview.List, error) {
+
 	list := tview.NewList()
 
 	for index, _ := range *boards {
 		br := (*boards)[index]
 		list.AddItem(br.BoardTitle, br.BoardBody, GetRune(index), func() {
 			go func() {
+				app.Stop()
 				*updatedSelectedBoard <- br.BoardId
 			}()
 		})

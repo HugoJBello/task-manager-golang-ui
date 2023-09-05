@@ -1,6 +1,9 @@
 package models
 
 type GlobalAppState struct {
-	selectedBoardId *string
-	selectedTaskId  *string
+	SelectedBoardId *string
+	SelectedTaskId  *string
+	Boards          *[]Board
+	TasksInBoard    *[]Task
+	SelectedBoard   *Board
 }
