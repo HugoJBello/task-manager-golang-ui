@@ -29,7 +29,7 @@ func (m *UiTasksManager) GetTasksListUi(app *tview.Application, updatedSelectedT
 
 		app.Stop()
 	})
-	list.SetBorder(true).SetTitle("")
+	list.SetBorder(true).SetTitle(*globalAppState.SelectedBoardId)
 
 	return list, nil
 }
