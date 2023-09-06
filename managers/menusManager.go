@@ -37,7 +37,7 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 
 func AddCycleFocus(flex *tview.Flex, app *tview.Application, inputs []tview.Primitive, globalAppState *models.GlobalAppState) {
 	flex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Key() == tcell.KeyTab {
+		if event.Key() == tcell.KeyCtrlSpace {
 			CycleFocus(app, inputs, false, globalAppState)
 		} else if event.Key() == tcell.KeyBacktab {
 			CycleFocus(app, inputs, true, globalAppState)
@@ -66,7 +66,6 @@ func CycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool
 			i = i + 1
 			i = i % len(elements)
 		}
-
 		app.SetFocus(elements[i])
 		globalAppState.FocusedElement = &i
 		return
