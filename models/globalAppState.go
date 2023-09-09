@@ -8,5 +8,6 @@ type GlobalAppState struct {
 	FocusedElement  *int
 	Boards          *[]Board
 	TasksInBoard    *[]Task
+	SelectedTask    *Task
 	SelectedBoard   *Board
 }

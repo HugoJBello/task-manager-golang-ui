@@ -26,10 +26,16 @@ func (m *UiTasksManager) GetTasksListUi(app *tview.Application, updatedSelectedB
 }
 
 func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][]models.Task, app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) ([]tview.Primitive, error) {
+
+	updateTaskManager := UpdateTaskManager{ApiManager: m.ApiManager}
+
 	inputs := []tview.Primitive{}
 
+	globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
 	for status, tasks := range tasksStatusMap {
-		list := generateListFromTasks(&tasks, updatedSelectedBoard, globalAppState, status)
+		pages := tview.NewPages()
+
+		list := generateListFromTasks(&tasks, pages, updatedSelectedBoard, globalAppState, status)
 
 		list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 
@@ -41,6 +47,11 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 
 				tasks := tasksStatusMap[status]
 				task := tasks[current]
+				globalAppState.SelectedTask = &task
+
+				form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)
+				pages.RemovePage("modal")
+				pages.AddPage("modal", form, true, false)
 
 				if event.Key() == tcell.KeyCtrlU {
 					m.createNewTaskWithStatus("doing", task, app, updatedSelectedBoard)
@@ -54,7 +65,9 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 			return event
 		})
 
-		inputs = append(inputs, list)
+		pages.AddPage("list", list, true, true)
+
+		inputs = append(inputs, pages)
 	}
 
 	//AddCycleFocus(flex, app, inputs)
@@ -71,12 +84,13 @@ func (m *UiTasksManager) createNewTaskWithStatus(newStatus string, task models.T
 	}()
 }
 
-func generateListFromTasks(tasks *[]models.Task, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState, title string) *tview.List {
+func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState, title string) *tview.List {
 	list := tview.NewList()
 	for index, _ := range *tasks {
 		br := (*tasks)[index]
 		list.AddItem(br.TaskTitle, br.TaskBody, GetRune(index), func() {
 			go func() {
+				pages.SwitchToPage("modal")
 			}()
 		})
 	}
@@ -86,6 +100,7 @@ func generateListFromTasks(tasks *[]models.Task, updatedSelectedBoard *chan stri
 	list.SetSelectedFunc(func(index int, mainText string, secondaryText string, shortcut rune) {
 		//fmt.Println(index, shortcut)
 	})
+	list.SetHighlightFullLine(true)
 	return list
 }
 

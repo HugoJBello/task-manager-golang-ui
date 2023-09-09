@@ -11,7 +11,6 @@ import (
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 )
 
-
 const version string = "/v1"
 
 const GetTaskRoute = version + "/task/last"
@@ -28,147 +27,140 @@ type ApiManager struct {
 	Url string
 }
 
-func (m *ApiManager) GetBoards() (*[]models.Board, error){
+func (m *ApiManager) GetBoards() (*[]models.Board, error) {
 
-		currentUrl := m.Url + GetBoardRoute+"?limit=10&skip=0"
+	currentUrl := m.Url + GetBoardRoute + "?limit=10&skip=0"
 
-		fmt.Println(currentUrl)
-		
-		resp, err := http.Get(currentUrl)
-	
-		if err != nil {
-			return nil, err
-		}
-	
-		if resp.StatusCode != 200 {
-			return nil, errors.New("error in api")
-		}
-	
-		bodyGetResp, err := ioutil.ReadAll(resp.Body)
-		var boardResponse models.BoardResponse
-		
-		json.Unmarshal(bodyGetResp, &boardResponse)
-	 
-		return &boardResponse.Data, nil
+	fmt.Println(currentUrl)
+
+	resp, err := http.Get(currentUrl)
+
+	if err != nil {
+		return nil, err
 	}
 
-	func (m *ApiManager) CreateBoard(board models.CreateBoard) (*[]models.Board, error){
-
-		currentUrl := m.Url + CreateBoardRoute 
-		jsonBody, _ := json.Marshal(board)
-
-		
-		resp, err := http.Post(currentUrl, "application/json", bytes.NewBuffer(jsonBody))
-	
-		if err != nil {
-			return nil, err
-		}
-	
-		if resp.StatusCode != 200 {
-			return nil, errors.New("error in api")
-		}
-	
-		bodyGetResp, err := ioutil.ReadAll(resp.Body)
-		var boardResponse models.BoardResponse
-		
-		json.Unmarshal(bodyGetResp, &boardResponse)
-	 
-		return &boardResponse.Data, nil
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
 	}
 
-	
-	func (m *ApiManager) UpdateBoard(board models.CreateBoard) (*[]models.Board, error){
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var boardResponse models.BoardResponse
 
-		currentUrl := m.Url + UpdateBoardRoute 
-		jsonBody, _ := json.Marshal(board)
+	json.Unmarshal(bodyGetResp, &boardResponse)
 
-		
-		resp, err := http.Post(currentUrl, "application/json", bytes.NewBuffer(jsonBody))
-	
-		if err != nil {
-			return nil, err
-		}
-	
-		if resp.StatusCode != 200 {
-			return nil, errors.New("error in api")
-		}
-	
-		bodyGetResp, err := ioutil.ReadAll(resp.Body)
-		var boardResponse models.BoardResponse
-		
-		json.Unmarshal(bodyGetResp, &boardResponse)
-	 
-		return &boardResponse.Data, nil
+	return &boardResponse.Data, nil
+}
+
+func (m *ApiManager) CreateBoard(board models.CreateBoard) (*[]models.Board, error) {
+
+	currentUrl := m.Url + CreateBoardRoute
+	jsonBody, _ := json.Marshal(board)
+
+	resp, err := http.Post(currentUrl, "application/json", bytes.NewBuffer(jsonBody))
+
+	if err != nil {
+		return nil, err
 	}
 
-
-func (m *ApiManager) GetTasksInBoard(boardId string) (*[]models.Task, error){
-
-		currentUrl := m.Url + GetTaskRoute+"?limit=100&skip=0&boardId=" + boardId
-
-	
-		resp, err := http.Get(currentUrl)
-	
-		if err != nil {
-			return nil, err
-		}
-	
-		if resp.StatusCode != 200 {
-			return nil, errors.New("error in api")
-		}
-	
-		bodyGetResp, err := ioutil.ReadAll(resp.Body)
-		var taskResponse models.TaskResponse
-		
-		json.Unmarshal(bodyGetResp, &taskResponse)
-	 
-		return &taskResponse.Data, nil
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
 	}
 
-	func (m *ApiManager) CreateTask(task models.CreateTask) (*[]models.Task, error){
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var boardResponse models.BoardResponse
 
-		currentUrl := m.Url + CreateTaskRoute 
-		jsonBody, _ := json.Marshal(task)
+	json.Unmarshal(bodyGetResp, &boardResponse)
 
-		
-		resp, err := http.Post(currentUrl, "application/json", bytes.NewBuffer(jsonBody))
-	
-		if err != nil {
-			return nil, err
-		}
-	
-		if resp.StatusCode != 200 {
-			return nil, errors.New("error in api")
-		}
-	
-		bodyGetResp, err := ioutil.ReadAll(resp.Body)
-		var taskResponse models.TaskResponse
-		
-		json.Unmarshal(bodyGetResp, &taskResponse)
-	 
-		return &taskResponse.Data, nil
+	return &boardResponse.Data, nil
+}
+
+func (m *ApiManager) UpdateBoard(board models.CreateBoard) (*[]models.Board, error) {
+
+	currentUrl := m.Url + UpdateBoardRoute
+	jsonBody, _ := json.Marshal(board)
+
+	resp, err := http.Post(currentUrl, "application/json", bytes.NewBuffer(jsonBody))
+
+	if err != nil {
+		return nil, err
 	}
 
-	func (m *ApiManager) UpdateTask(task models.CreateTask) (*[]models.Task, error){
-
-		currentUrl := m.Url + UpdateTaskRoute 
-		jsonBody, _ := json.Marshal(task)
-
-		
-		resp, err := http.Post(currentUrl, "application/json", bytes.NewBuffer(jsonBody))
-	
-		if err != nil {
-			return nil, err
-		}
-	
-		if resp.StatusCode != 200 {
-			return nil, errors.New("error in api")
-		}
-	
-		bodyGetResp, err := ioutil.ReadAll(resp.Body)
-		var taskResponse models.TaskResponse
-		
-		json.Unmarshal(bodyGetResp, &taskResponse)
-	 
-		return &taskResponse.Data, nil
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
 	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var boardResponse models.BoardResponse
+
+	json.Unmarshal(bodyGetResp, &boardResponse)
+
+	return &boardResponse.Data, nil
+}
+
+func (m *ApiManager) GetTasksInBoard(boardId string) (*[]models.Task, error) {
+
+	currentUrl := m.Url + GetTaskRoute + "?limit=100&skip=0&boardId=" + boardId
+
+	resp, err := http.Get(currentUrl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
+	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var taskResponse models.TaskResponse
+
+	json.Unmarshal(bodyGetResp, &taskResponse)
+
+	return &taskResponse.Data, nil
+}
+
+func (m *ApiManager) CreateTask(task models.CreateTask) (*[]models.Task, error) {
+
+	currentUrl := m.Url + CreateTaskRoute
+	jsonBody, _ := json.Marshal(task)
+
+	resp, err := http.Post(currentUrl, "application/json", bytes.NewBuffer(jsonBody))
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
+	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var taskResponse models.TaskResponse
+
+	json.Unmarshal(bodyGetResp, &taskResponse)
+
+	return &taskResponse.Data, nil
+}
+
+func (m *ApiManager) UpdateTask(task models.CreateTask) (*[]models.Task, error) {
+
+	currentUrl := m.Url + UpdateTaskRoute
+	jsonBody, _ := json.Marshal(task)
+
+	resp, err := http.Post(currentUrl, "application/json", bytes.NewBuffer(jsonBody))
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
+	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var taskResponse models.TaskResponse
+
+	json.Unmarshal(bodyGetResp, &taskResponse)
+
+	return &taskResponse.Data, nil
+}
