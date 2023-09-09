@@ -59,11 +59,11 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 				pages.AddPage("modal", form, true, false)
 
 				if event.Key() == tcell.KeyCtrlU && *globalAppState.FocusedElement != 0 {
-					m.createNewTaskWithStatus("doing", task, app, updatedSelectedBoard)
+					m.updateNewTaskWithStatus("doing", task, app, updatedSelectedBoard)
 				} else if event.Key() == tcell.KeyCtrlD && *globalAppState.FocusedElement != 0 {
-					m.createNewTaskWithStatus("done", task, app, updatedSelectedBoard)
+					m.updateNewTaskWithStatus("done", task, app, updatedSelectedBoard)
 				} else if event.Key() == tcell.KeyCtrlB && *globalAppState.FocusedElement != 0 {
-					m.createNewTaskWithStatus("blocked", task, app, updatedSelectedBoard)
+					m.updateNewTaskWithStatus("blocked", task, app, updatedSelectedBoard)
 				} else if event.Key() == tcell.KeyDelete && *globalAppState.FocusedElement != 0 {
 					m.deleteTask(task, app, updatedSelectedBoard)
 				} else if event.Key() == tcell.KeyCtrlN && *globalAppState.FocusedElement != 0 {
@@ -86,7 +86,7 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 	return inputs, nil
 }
 
-func (m *UiTasksManager) createNewTaskWithStatus(newStatus string, task models.Task, app *tview.Application, updatedSelectedBoard *chan string) {
+func (m *UiTasksManager) updateNewTaskWithStatus(newStatus string, task models.Task, app *tview.Application, updatedSelectedBoard *chan string) {
 	var taskId = task.TaskId
 	if taskId == "" {
 		taskId = task.TaskTitle
