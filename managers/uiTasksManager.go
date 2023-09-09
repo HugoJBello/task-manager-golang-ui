@@ -1,6 +1,8 @@
 package managers
 
 import (
+	"sort"
+
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -14,37 +16,40 @@ func (m *UiTasksManager) GetTasksListUi(app *tview.Application, updatedSelectedB
 
 	tasks := globalAppState.TasksInBoard
 	tasksStatusMap := m.organizeTasksUsingStatus(*tasks)
-	statuses := make([]string, 0, len(tasksStatusMap))
+	var statuses = make([]string, 0, len(tasksStatusMap))
 	for k := range tasksStatusMap {
 		statuses = append(statuses, k)
 	}
 
+	sort.Strings(statuses)
+	
 	globalAppState.Statuses = &statuses
 
-	return m.generateFrameListsFromTasks(tasksStatusMap, app, updatedSelectedBoard, globalAppState)
+	return m.generateFrameListsFromTasks(tasksStatusMap,statuses, app, updatedSelectedBoard, globalAppState)
 
 }
 
-func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][]models.Task, app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) ([]tview.Primitive, error) {
+func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][]models.Task, statuses []string, app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) ([]tview.Primitive, error) {
 
 	updateTaskManager := UpdateTaskManager{ApiManager: m.ApiManager}
 
 	inputs := []tview.Primitive{}
 
 	globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
-	for status, tasks := range tasksStatusMap {
+	for _, status := range statuses {
 		pages := tview.NewPages()
+		tasks := tasksStatusMap[status]
 
 		list := generateListFromTasks(&tasks, pages, updatedSelectedBoard, globalAppState, status)
 
 		list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 
-			if list.HasFocus() && *globalAppState.FocusedElement != 0 {
+			//if list.HasFocus() && *globalAppState.FocusedElement != 0 {
+			if list.HasFocus() {
 				current := list.GetCurrentItem()
-
-				statuses := *globalAppState.Statuses
-				status := statuses[*globalAppState.FocusedElement-1]
-
+				status = list.GetTitle()
+				//statuses := *globalAppState.Statuses
+				//status := statuses[*globalAppState.FocusedElement-1]
 				tasks := tasksStatusMap[status]
 				task := tasks[current]
 				globalAppState.SelectedTask = &task
@@ -53,11 +58,11 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 				pages.RemovePage("modal")
 				pages.AddPage("modal", form, true, false)
 
-				if event.Key() == tcell.KeyCtrlU {
+				if event.Key() == tcell.KeyCtrlU && *globalAppState.FocusedElement != 0 {
 					m.createNewTaskWithStatus("doing", task, app, updatedSelectedBoard)
-				} else if event.Key() == tcell.KeyCtrlD {
+				} else if event.Key() == tcell.KeyCtrlD && *globalAppState.FocusedElement != 0 {
 					m.createNewTaskWithStatus("done", task, app, updatedSelectedBoard)
-				} else if event.Key() == tcell.KeyCtrlB {
+				} else if event.Key() == tcell.KeyCtrlB && *globalAppState.FocusedElement != 0 {
 					m.createNewTaskWithStatus("blocked", task, app, updatedSelectedBoard)
 				}
 
@@ -101,12 +106,14 @@ func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, updatedSele
 		//fmt.Println(index, shortcut)
 	})
 	list.SetHighlightFullLine(true)
+	if (*tasks)[0].Status == "doing" {
+		list.SetBackgroundColor(tcell.Color100)
+	}
 	return list
 }
 
 func (m *UiTasksManager) organizeTasksUsingStatus(tasks []models.Task) map[string][]models.Task {
 	result := make(map[string][]models.Task)
-
 	for i := 0; i < len(tasks); i++ {
 		tk := tasks[i]
 		if result[tk.Status] == nil {

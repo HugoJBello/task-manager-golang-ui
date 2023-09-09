@@ -16,6 +16,8 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	tasksInBoard, _ := m.ApiManager.GetTasksInBoard(*globalAppState.SelectedBoardId)
 	globalAppState.TasksInBoard = tasksInBoard
 
+	i := 0
+	globalAppState.FocusedElement = &i
 	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, updatedSelectedBoard, globalAppState)
 
 	// Create the layout.
