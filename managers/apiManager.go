@@ -119,6 +119,31 @@ func (m *ApiManager) GetTasksInBoard(boardId string) (*[]models.Task, error) {
 	return &taskResponse.Data, nil
 }
 
+func (m *ApiManager) DeleteTask(taskId string) (*[]models.Task, error) {
+
+	currentUrl := m.Url + DeleteTaskRoute + "?id=" + taskId
+
+	req, err := http.NewRequest(http.MethodDelete, currentUrl, nil)
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
+	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var taskResponse models.TaskResponse
+
+	json.Unmarshal(bodyGetResp, &taskResponse)
+
+	return &taskResponse.Data, nil
+}
+
 func (m *ApiManager) CreateTask(task models.CreateTask) (*[]models.Task, error) {
 
 	currentUrl := m.Url + CreateTaskRoute

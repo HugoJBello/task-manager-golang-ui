@@ -22,10 +22,10 @@ func (m *UiTasksManager) GetTasksListUi(app *tview.Application, updatedSelectedB
 	}
 
 	sort.Strings(statuses)
-	
+
 	globalAppState.Statuses = &statuses
 
-	return m.generateFrameListsFromTasks(tasksStatusMap,statuses, app, updatedSelectedBoard, globalAppState)
+	return m.generateFrameListsFromTasks(tasksStatusMap, statuses, app, updatedSelectedBoard, globalAppState)
 
 }
 
@@ -64,6 +64,13 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 					m.createNewTaskWithStatus("done", task, app, updatedSelectedBoard)
 				} else if event.Key() == tcell.KeyCtrlB && *globalAppState.FocusedElement != 0 {
 					m.createNewTaskWithStatus("blocked", task, app, updatedSelectedBoard)
+				} else if event.Key() == tcell.KeyDelete && *globalAppState.FocusedElement != 0 {
+					m.deleteTask(task, app, updatedSelectedBoard)
+				} else if event.Key() == tcell.KeyCtrlN && *globalAppState.FocusedElement != 0 {
+					globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
+					form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)
+					pages.RemovePage("modal")
+					pages.AddPage("modal", form, true, true)
 				}
 
 			}
@@ -80,9 +87,22 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 }
 
 func (m *UiTasksManager) createNewTaskWithStatus(newStatus string, task models.Task, app *tview.Application, updatedSelectedBoard *chan string) {
-	createTask := models.CreateTask{TaskId: task.TaskId, TaskTitle: task.TaskTitle,
+	var taskId = task.TaskId
+	if taskId == "" {
+		taskId = task.TaskTitle
+	}
+	createTask := models.CreateTask{TaskId: taskId, TaskTitle: task.TaskTitle,
 		TaskBody: task.TaskBody, Tags: task.Tags, Status: newStatus, BoardId: task.BoardId, DueDate: task.DueDate}
 	m.ApiManager.UpdateTask(createTask)
+	go func() {
+		app.Stop()
+		*updatedSelectedBoard <- task.BoardId
+	}()
+}
+
+func (m *UiTasksManager) deleteTask(task models.Task, app *tview.Application, updatedSelectedBoard *chan string) {
+
+	m.ApiManager.DeleteTask(task.TaskId)
 	go func() {
 		app.Stop()
 		*updatedSelectedBoard <- task.BoardId
