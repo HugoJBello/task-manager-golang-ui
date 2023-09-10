@@ -31,16 +31,18 @@ func main() {
 	updatedSelectedBoard := make(chan string)
 
 	app := tview.NewApplication()
+	pages := tview.NewPages()
+
 	fmt.Println(boards)
-	listBoards, _ := uiBoardsManager.GetBoardsListUi(boards, app, &globalAppState, &updatedSelectedBoard)
+	sideMenu, _ := uiBoardsManager.GetBoardsListUi(boards, app, pages, &globalAppState, &updatedSelectedBoard)
 
 	globalAppState.SelectedBoardId = &(*boards)[0].BoardId
-	menusManager.LoadMenus(listBoards, app, &updatedSelectedBoard, &globalAppState)
+	menusManager.LoadMenus(sideMenu, app, pages, &updatedSelectedBoard, &globalAppState)
 
 	for selected := range updatedSelectedBoard {
 		if selected != "none" {
 			globalAppState.SelectedBoardId = &selected
-			menusManager.LoadMenus(listBoards, app, &updatedSelectedBoard, &globalAppState)
+			menusManager.LoadMenus(sideMenu, app, pages, &updatedSelectedBoard, &globalAppState)
 		}
 		app.Stop()
 	}

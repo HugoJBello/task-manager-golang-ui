@@ -9,9 +9,10 @@ import (
 type MenusManager struct {
 	ApiManager     ApiManager
 	UiTasksManager UiTasksManager
+	HistoryViewManager HistoryViewManager
 }
 
-func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) {
+func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) {
 
 	tasksInBoard, _ := m.ApiManager.GetTasksInBoard(*globalAppState.SelectedBoardId)
 	globalAppState.TasksInBoard = tasksInBoard
@@ -20,7 +21,6 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	globalAppState.FocusedElement = &i
 	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, updatedSelectedBoard, globalAppState)
 
-	// Create the layout.
 	flex := tview.NewFlex().
 		AddItem(listBoards, 0, 1, true)
 
@@ -28,12 +28,21 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 		flex.AddItem(tasksList[index], 0, 1, true)
 	}
 
+	historicList := m.HistoryViewManager.AddHistoryPage(app, pages, globalAppState)
+
+	pages.AddPage("historic", historicList, true, true)
+
+	pages.AddPage("tasks_board", flex, true, true)
+
 	inputs := []tview.Primitive{
 		listBoards,
 	}
 	inputs = append(inputs, tasksList...)
 
 	AddCycleFocus(flex, app, inputs, globalAppState)
+	if err := app.SetRoot(pages, true).EnableMouse(true).Run(); err != nil {
+		panic(err)
+	}
 
 }
 
@@ -47,10 +56,6 @@ func AddCycleFocus(flex *tview.Flex, app *tview.Application, inputs []tview.Prim
 		return event
 
 	})
-
-	if err := app.SetRoot(flex, true).EnableMouse(true).Run(); err != nil {
-		panic(err)
-	}
 }
 
 func CycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool, globalAppState *models.GlobalAppState) {

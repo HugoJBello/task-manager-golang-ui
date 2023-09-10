@@ -8,7 +8,7 @@ import (
 type UiBoardsManager struct {
 }
 
-func (m *UiBoardsManager) GetBoardsListUi(boards *[]models.Board, app *tview.Application, globalAppState *models.GlobalAppState, updatedSelectedBoard *chan string) (*tview.List, error) {
+func (m *UiBoardsManager) GetBoardsListUi(boards *[]models.Board, app *tview.Application, pages *tview.Pages, globalAppState *models.GlobalAppState, updatedSelectedBoard *chan string) (*tview.List, error) {
 
 	list := tview.NewList()
 
@@ -21,6 +21,11 @@ func (m *UiBoardsManager) GetBoardsListUi(boards *[]models.Board, app *tview.App
 			}()
 		})
 	}
+
+	list.AddItem("History", "Access history", 'h', func() {
+			pages.SwitchToPage("historic")
+	})
+	
 
 	list.AddItem("Quit", "Press to exit", 'q', func() {
 		go func() {
