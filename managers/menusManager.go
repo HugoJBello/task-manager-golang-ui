@@ -22,7 +22,7 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, updatedSelectedBoard, globalAppState)
 
 	flex := tview.NewFlex().
-		AddItem(listBoards, 0, 1, true)
+		AddItem(listBoards, 18, 0, true)
 
 	tasksFlex := tview.NewFlex()
 
