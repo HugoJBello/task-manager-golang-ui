@@ -7,12 +7,12 @@ import (
 )
 
 type MenusManager struct {
-	ApiManager     ApiManager
-	UiTasksManager UiTasksManager
+	ApiManager         ApiManager
+	UiTasksManager     UiTasksManager
 	HistoryViewManager HistoryViewManager
 }
 
-func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) {
+func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState, horizontalView bool) {
 
 	tasksInBoard, _ := m.ApiManager.GetTasksInBoard(*globalAppState.SelectedBoardId)
 	globalAppState.TasksInBoard = tasksInBoard
@@ -24,9 +24,17 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	flex := tview.NewFlex().
 		AddItem(listBoards, 0, 1, true)
 
-	for index, _ := range tasksList {
-		flex.AddItem(tasksList[index], 0, 1, true)
+	tasksFlex := tview.NewFlex()
+
+	if horizontalView == true {
+		tasksFlex.SetDirection(tview.FlexRow)
 	}
+
+	for index, _ := range tasksList {
+		tasksFlex.AddItem(tasksList[index], 0, 1, true)
+	}
+
+	flex.AddItem(tasksFlex, 0, 3, false)
 
 	historicList := m.HistoryViewManager.AddHistoryPage(app, pages, globalAppState)
 

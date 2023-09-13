@@ -37,12 +37,12 @@ func main() {
 	sideMenu, _ := uiBoardsManager.GetBoardsListUi(boards, app, pages, &globalAppState, &updatedSelectedBoard)
 
 	globalAppState.SelectedBoardId = &(*boards)[0].BoardId
-	menusManager.LoadMenus(sideMenu, app, pages, &updatedSelectedBoard, &globalAppState)
+	menusManager.LoadMenus(sideMenu, app, pages, &updatedSelectedBoard, &globalAppState, false)
 
 	for selected := range updatedSelectedBoard {
 		if selected != "none" {
 			globalAppState.SelectedBoardId = &selected
-			menusManager.LoadMenus(sideMenu, app, pages, &updatedSelectedBoard, &globalAppState)
+			menusManager.LoadMenus(sideMenu, app, pages, &updatedSelectedBoard, &globalAppState, false)
 		}
 		app.Stop()
 	}

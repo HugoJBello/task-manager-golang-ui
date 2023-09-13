@@ -23,9 +23,8 @@ func (m *UiBoardsManager) GetBoardsListUi(boards *[]models.Board, app *tview.App
 	}
 
 	list.AddItem("History", "Access history", 'h', func() {
-			pages.SwitchToPage("historic")
+		pages.SwitchToPage("historic")
 	})
-	
 
 	list.AddItem("Quit", "Press to exit", 'q', func() {
 		go func() {
@@ -35,7 +34,7 @@ func (m *UiBoardsManager) GetBoardsListUi(boards *[]models.Board, app *tview.App
 
 		app.Stop()
 	})
-
+	list.SetBorder(false)
 	return list, nil
 }
 
