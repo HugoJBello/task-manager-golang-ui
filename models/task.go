@@ -10,6 +10,10 @@ type Task struct {
 	Tags      string     `json:"tags" bson:"tags"`
 	Status    string     `json:"status" bson:"status"`
 	BoardId   string     `json:"boardId" bson:"boardId"`
+	Priority  *int       `json:"priority" bson:"priority"`
+	Dificulty *int       `json:"dificulty" bson:"dificulty"`
+	Type      *string    `json:"type" bson:"type"`
+	Archived  *bool      `json:"archived" bson:"archived"`
 	CreatedAt *time.Time `json:"createdAt" bson:"createdAt"`
 	EditedAt  *time.Time `json:"editedAt" bson:"editedAt"`
 	DueDate   *time.Time `json:"dueDate" bson:"dueDate"`
@@ -23,8 +27,12 @@ type CreateTask struct {
 	Tags      string     `json:"tags" bson:"tags"`
 	Status    string     `json:"status" bson:"status"`
 	BoardId   string     `json:"boardId" bson:"boardId"`
+	Priority  *int       `json:"priority" bson:"priority"`
+	Dificulty *int       `json:"dificulty" bson:"dificulty"`
+	Type      *string    `json:"type" bson:"type"`
 	DueDate   *time.Time `json:"dueDate" bson:"dueDate"`
 	CreatedBy string     `json:"createdBy" bson:"createdBy"`
+	Archived  *bool      `json:"archived" bson:"archived"`
 }
 
 type TaskResponse struct {

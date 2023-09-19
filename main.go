@@ -20,7 +20,8 @@ func init() {
 	gotenv.Load()
 	apiManager = managers.ApiManager{Url: os.Getenv("API_URL")}
 	uiTasksManager = managers.UiTasksManager{ApiManager: apiManager}
-	menusManager = managers.MenusManager{ApiManager: apiManager, UiTasksManager: uiTasksManager}
+	historyViewManager := managers.HistoryViewManager{ApiManager: apiManager}
+	menusManager = managers.MenusManager{ApiManager: apiManager, UiTasksManager: uiTasksManager, HistoryViewManager: historyViewManager}
 }
 
 func main() {

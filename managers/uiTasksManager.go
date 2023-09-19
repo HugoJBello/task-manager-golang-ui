@@ -2,6 +2,7 @@ package managers
 
 import (
 	"sort"
+	"strconv"
 
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 	"github.com/gdamore/tcell/v2"
@@ -34,8 +35,10 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 	updateTaskManager := UpdateTaskManager{ApiManager: m.ApiManager}
 
 	inputs := []tview.Primitive{}
+	priority := 1
+	dificulty := 1
 
-	globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
+	globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", Priority: &priority, Dificulty: &dificulty, TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
 	for _, status := range statuses {
 		pages := tview.NewPages()
 		tasks := tasksStatusMap[status]
@@ -113,7 +116,19 @@ func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, updatedSele
 	list := tview.NewList()
 	for index, _ := range *tasks {
 		br := (*tasks)[index]
-		list.AddItem(br.TaskTitle, br.TaskBody, GetRune(index), func() {
+		var subtext = ""
+		if br.Dificulty != nil {
+			subtext = subtext + "[::bl] DIF: " + strconv.Itoa(*br.Dificulty) + "[-:-:-:-]"
+		} else {
+			subtext = subtext + "[::bl] DIF: 1[-:-:-:-]"
+		}
+		if br.Priority != nil {
+			subtext = subtext + " PRIO: " + strconv.Itoa(*br.Priority)
+		} else {
+			subtext = subtext + " PRIO: 1"
+		}
+		subtext = subtext + " - " + br.TaskBody
+		list.AddItem(br.TaskTitle, subtext, GetRune(index), func() {
 			go func() {
 				pages.SwitchToPage("modal")
 			}()

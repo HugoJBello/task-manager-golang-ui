@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 )
@@ -17,6 +18,8 @@ const GetTaskRoute = version + "/task/last"
 const CreateTaskRoute = version + "/task/new"
 const UpdateTaskRoute = version + "/task/save"
 const DeleteTaskRoute = version + "/task/delete"
+
+const GetTaskHistoryRoute = version + "/history/last"
 
 const GetBoardRoute = version + "/board/last"
 const CreateBoardRoute = version + "/board/new"
@@ -29,7 +32,7 @@ type ApiManager struct {
 
 func (m *ApiManager) GetBoards() (*[]models.Board, error) {
 
-	currentUrl := m.Url + GetBoardRoute + "?limit=10&skip=0"
+	currentUrl := m.Url + GetBoardRoute + "?limit=100&skip=0"
 
 	fmt.Println(currentUrl)
 
@@ -113,6 +116,55 @@ func (m *ApiManager) GetTasksInBoard(boardId string) (*[]models.Task, error) {
 
 	bodyGetResp, err := ioutil.ReadAll(resp.Body)
 	var taskResponse models.TaskResponse
+
+	json.Unmarshal(bodyGetResp, &taskResponse)
+
+	return &taskResponse.Data, nil
+}
+
+func (m *ApiManager) GetTasksHistoryInBoard(boardId string, limit int) (*[]models.TaskHistory, error) {
+
+	limitStr := strconv.Itoa(limit)
+
+	currentUrl := m.Url + GetTaskHistoryRoute + "?skip=0&boardId=" + boardId + "&limit=" + limitStr
+
+	resp, err := http.Get(currentUrl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
+	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var taskResponse models.TaskHistoryResponse
+
+	json.Unmarshal(bodyGetResp, &taskResponse)
+
+	return &taskResponse.Data, nil
+}
+
+func (m *ApiManager) GetTasksHistory(limit int) (*[]models.TaskHistory, error) {
+
+	limitStr := strconv.Itoa(limit)
+
+	currentUrl := m.Url + GetTaskHistoryRoute + "?skip=0&limit=" + limitStr
+	fmt.Println(currentUrl)
+
+	resp, err := http.Get(currentUrl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
+	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var taskResponse models.TaskHistoryResponse
 
 	json.Unmarshal(bodyGetResp, &taskResponse)
 
