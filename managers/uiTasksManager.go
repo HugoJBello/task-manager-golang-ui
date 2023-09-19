@@ -149,6 +149,7 @@ func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, updatedSele
 
 func (m *UiTasksManager) organizeTasksUsingStatus(tasks []models.Task) map[string][]models.Task {
 	result := make(map[string][]models.Task)
+
 	for i := 0; i < len(tasks); i++ {
 		tk := tasks[i]
 		if result[tk.Status] == nil {
@@ -156,6 +157,20 @@ func (m *UiTasksManager) organizeTasksUsingStatus(tasks []models.Task) map[strin
 		} else {
 			result[tk.Status] = append(result[tk.Status], tk)
 		}
+	}
+
+	for status := range result {
+		sort.SliceStable(result[status], func(i, j int) bool {
+			var prioi = 1
+			var prioj = 1
+			if result[status][i].Priority != nil {
+				prioi = *result[status][i].Priority
+			}
+			if result[status][j].Priority != nil {
+				prioj = *result[status][j].Priority
+			}
+			return prioi > prioj
+		})
 	}
 
 	return result
