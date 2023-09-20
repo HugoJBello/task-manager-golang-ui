@@ -38,7 +38,7 @@ func (m *HistoryViewManager) getHistoryText(taskHistory models.TaskHistory) stri
 	title := taskHistory.TaskTitle
 	oldStatus := taskHistory.OldStatus
 	newStatus := taskHistory.NewStatus
-	return title + oldStatus + " --> " + newStatus
+	return title + " [black:red]" + oldStatus + "[-:-:-:-] --> [black:red]" + newStatus + "[-:-:-:-]"
 }
 
 func (m *HistoryViewManager) getHistorySubText(taskHistory models.TaskHistory) string {
