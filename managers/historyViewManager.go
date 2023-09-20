@@ -48,7 +48,7 @@ func (m *HistoryViewManager) getHistorySubText(taskHistory models.TaskHistory) s
 	}
 
 	var priority = "1"
-	if taskHistory.Dificulty != nil {
+	if taskHistory.Priority != nil {
 		priority = strconv.Itoa(*taskHistory.Priority)
 	}
 
