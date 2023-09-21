@@ -20,6 +20,7 @@ const UpdateTaskRoute = version + "/task/save"
 const DeleteTaskRoute = version + "/task/delete"
 
 const GetTaskHistoryRoute = version + "/history/last"
+const GetPointsRoute = version + "/points/week"
 
 const GetBoardRoute = version + "/board/last"
 const CreateBoardRoute = version + "/board/new"
@@ -169,6 +170,51 @@ func (m *ApiManager) GetTasksHistory(limit int) (*[]models.TaskHistory, error) {
 	json.Unmarshal(bodyGetResp, &taskResponse)
 
 	return &taskResponse.Data, nil
+}
+
+func (m *ApiManager) GetPointsCurrentWeek(boardId string) (*[]models.PointsReport, error) {
+
+	currentUrl := m.Url + GetPointsRoute + "?boardId=" + boardId
+
+	resp, err := http.Get(currentUrl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
+	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var pointsReportResponse models.PointsReportResponse
+
+	json.Unmarshal(bodyGetResp, &pointsReportResponse)
+
+	return &pointsReportResponse.Data, nil
+}
+
+func (m *ApiManager) GetPointsWeek(boardId string, week int) (*[]models.PointsReport, error) {
+
+	weekStr := strconv.Itoa(week)
+	currentUrl := m.Url + GetPointsRoute + "?boardId=" + boardId + "&week=" + weekStr
+
+	resp, err := http.Get(currentUrl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New("error in api")
+	}
+
+	bodyGetResp, err := ioutil.ReadAll(resp.Body)
+	var pointsReportResponse models.PointsReportResponse
+
+	json.Unmarshal(bodyGetResp, &pointsReportResponse)
+
+	return &pointsReportResponse.Data, nil
 }
 
 func (m *ApiManager) DeleteTask(taskId string) (*[]models.Task, error) {

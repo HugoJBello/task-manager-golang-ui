@@ -7,9 +7,10 @@ import (
 )
 
 type MenusManager struct {
-	ApiManager         ApiManager
-	UiTasksManager     UiTasksManager
-	HistoryViewManager HistoryViewManager
+	ApiManager           ApiManager
+	UiTasksManager       UiTasksManager
+	HistoryViewManager   HistoryViewManager
+	ButtonBarViewManager ButtonBarViewManager
 }
 
 func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState, horizontalView bool) {
@@ -21,7 +22,7 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	globalAppState.FocusedElement = &i
 	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, updatedSelectedBoard, globalAppState)
 
-	flex := tview.NewFlex().
+	tasksWithSideMenuflex := tview.NewFlex().
 		AddItem(listBoards, 18, 0, true)
 
 	tasksFlex := tview.NewFlex()
@@ -34,21 +35,28 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 		tasksFlex.AddItem(tasksList[index], 0, 1, true)
 	}
 
-	flex.AddItem(tasksFlex, 0, 3, false)
+	tasksWithSideMenuflex.AddItem(tasksFlex, 0, 3, false)
 
 	historicList := m.HistoryViewManager.AddHistoryPage(app, pages, globalAppState)
 
 	pages.AddPage("historic", historicList, true, true)
-
-	pages.AddPage("tasks_board", flex, true, true)
+	pages.AddPage("tasks_board", tasksWithSideMenuflex, true, true)
 
 	inputs := []tview.Primitive{
 		listBoards,
 	}
 	inputs = append(inputs, tasksList...)
 
-	AddCycleFocus(flex, app, inputs, globalAppState)
-	if err := app.SetRoot(pages, true).EnableMouse(true).Run(); err != nil {
+	AddCycleFocus(tasksWithSideMenuflex, app, inputs, globalAppState)
+
+	lowerBarFlex := tview.NewFlex().SetDirection(tview.FlexRow)
+
+	lowerBarMenu := m.ButtonBarViewManager.CreateButtonBarWithPoints(globalAppState)
+
+	lowerBarFlex.AddItem(pages, 0, 1, true)
+	lowerBarFlex.AddItem(lowerBarMenu, 2, 0, false)
+
+	if err := app.SetRoot(lowerBarFlex, true).EnableMouse(true).Run(); err != nil {
 		panic(err)
 	}
 

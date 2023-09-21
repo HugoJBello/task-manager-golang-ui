@@ -15,13 +15,18 @@ var apiManager managers.ApiManager
 var uiTasksManager managers.UiTasksManager
 var uiBoardsManager = managers.UiBoardsManager{}
 var menusManager managers.MenusManager
+var buttonBarViewManager managers.ButtonBarViewManager
 
 func init() {
 	gotenv.Load()
 	apiManager = managers.ApiManager{Url: os.Getenv("API_URL")}
 	uiTasksManager = managers.UiTasksManager{ApiManager: apiManager}
 	historyViewManager := managers.HistoryViewManager{ApiManager: apiManager}
-	menusManager = managers.MenusManager{ApiManager: apiManager, UiTasksManager: uiTasksManager, HistoryViewManager: historyViewManager}
+	buttonBarViewManager = managers.ButtonBarViewManager{ApiManager: apiManager}
+
+	menusManager = managers.MenusManager{ApiManager: apiManager,
+		UiTasksManager: uiTasksManager, HistoryViewManager: historyViewManager,
+		ButtonBarViewManager: buttonBarViewManager}
 }
 
 func main() {
