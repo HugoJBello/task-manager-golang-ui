@@ -59,7 +59,6 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	if err := app.SetRoot(lowerBarFlex, true).EnableMouse(true).Run(); err != nil {
 		panic(err)
 	}
-
 }
 
 func AddCycleFocus(flex *tview.Flex, app *tview.Application, inputs []tview.Primitive, globalAppState *models.GlobalAppState) {

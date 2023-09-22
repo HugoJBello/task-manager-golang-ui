@@ -129,9 +129,8 @@ func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, updatedSele
 		}
 		subtext = subtext + " - " + br.TaskBody
 		list.AddItem(br.TaskTitle, subtext, GetRune(index), func() {
-			go func() {
-				pages.SwitchToPage("modal")
-			}()
+			pages.SwitchToPage("modal")
+
 		})
 	}
 
