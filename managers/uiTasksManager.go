@@ -127,10 +127,12 @@ func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, updatedSele
 		} else {
 			subtext = subtext + " PRIO: 1"
 		}
+
 		subtext = subtext + " - " + br.TaskBody
 		list.AddItem(br.TaskTitle, subtext, GetRune(index), func() {
-			pages.SwitchToPage("modal")
-
+			if pages.HasPage("modal") {
+				pages.SwitchToPage("modal")
+			}
 		})
 	}
 

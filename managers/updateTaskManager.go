@@ -72,9 +72,12 @@ func (m *UpdateTaskManager) GenerateUpdateTaskForm(app *tview.Application, pages
 				*updatedSelectedBoard <- task.BoardId
 			}()
 			pages.SwitchToPage("list")
+			pages.RemovePage("modal")
+
 		}).
 		AddButton("Quit", func() {
 			pages.SwitchToPage("list")
+			pages.RemovePage("modal")
 		})
 
 	return form, nil
