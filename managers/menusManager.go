@@ -11,6 +11,7 @@ type MenusManager struct {
 	UiTasksManager       UiTasksManager
 	HistoryViewManager   HistoryViewManager
 	ButtonBarViewManager ButtonBarViewManager
+	ActionsViewManager   ActionsViewManager
 }
 
 func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState, horizontalView bool) {
@@ -40,6 +41,11 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	historicList := m.HistoryViewManager.AddHistoryPage(app, pages, globalAppState)
 
 	pages.AddPage("historic", historicList, true, true)
+
+	actionsList := m.ActionsViewManager.AddActionsPage(app, pages,updatedSelectedBoard, globalAppState)
+
+	pages.AddPage("actions", actionsList, true, true)
+
 	pages.AddPage("tasks_board", tasksWithSideMenuflex, true, true)
 
 	inputs := []tview.Primitive{

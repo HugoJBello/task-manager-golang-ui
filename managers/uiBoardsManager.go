@@ -26,6 +26,10 @@ func (m *UiBoardsManager) GetBoardsListUi(boards *[]models.Board, app *tview.App
 		pages.SwitchToPage("historic")
 	})
 
+	list.AddItem("Actions", "Other actions", 'a', func() {
+		pages.SwitchToPage("actions")
+	})
+
 	list.AddItem("Quit", "Press to exit", 'q', func() {
 		go func() {
 			*updatedSelectedBoard <- "none"

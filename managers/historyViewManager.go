@@ -1,7 +1,6 @@
 package managers
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/HugoJBello/task-manager-golang-ui/models"
@@ -15,7 +14,6 @@ type HistoryViewManager struct {
 func (m *HistoryViewManager) AddHistoryPage(app *tview.Application, pages *tview.Pages, globalAppState *models.GlobalAppState) *tview.List {
 
 	tasksHistory, _ := m.ApiManager.GetTasksHistory(100)
-	fmt.Println("----->", tasksHistory)
 
 	list := tview.NewList()
 

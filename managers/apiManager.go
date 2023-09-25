@@ -119,8 +119,20 @@ func (m *ApiManager) GetTasksInBoard(boardId string) (*[]models.Task, error) {
 	var taskResponse models.TaskResponse
 
 	json.Unmarshal(bodyGetResp, &taskResponse)
+	filtered := m.filterArchived(taskResponse.Data)
+	return &filtered, nil
+}
 
-	return &taskResponse.Data, nil
+func (m *ApiManager) filterArchived(tasks []models.Task) []models.Task {
+
+	filteredTasks := []models.Task{}
+
+	for index, task := range tasks {
+		if task.Archived == nil || *task.Archived == "false" {
+			filteredTasks = append(filteredTasks, tasks[index])
+		}
+	}
+	return filteredTasks
 }
 
 func (m *ApiManager) GetTasksHistoryInBoard(boardId string, limit int) (*[]models.TaskHistory, error) {
@@ -286,4 +298,17 @@ func (m *ApiManager) UpdateTask(task models.CreateTask) (*[]models.Task, error) 
 	json.Unmarshal(bodyGetResp, &taskResponse)
 
 	return &taskResponse.Data, nil
+}
+
+func (m *ApiManager) ArchiveTasks(tasks *[]models.Task) error {
+	archived := "true"
+	for _, task := range *tasks {
+		update := models.CreateTask{TaskId: task.TaskId, TaskTitle: task.TaskTitle, TaskBody: task.TaskBody,
+			Tags: task.Tags, Status: task.Status, BoardId: task.BoardId,
+			Priority: task.Priority, Dificulty: task.Dificulty, Type: task.Type, DueDate: task.DueDate, CreatedBy: task.CreatedBy,
+			Archived: &archived}
+		_, err := m.UpdateTask(update)
+		fmt.Println(err)
+	}
+	return nil
 }
