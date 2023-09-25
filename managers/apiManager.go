@@ -307,8 +307,7 @@ func (m *ApiManager) ArchiveTasks(tasks *[]models.Task) error {
 			Tags: task.Tags, Status: task.Status, BoardId: task.BoardId,
 			Priority: task.Priority, Dificulty: task.Dificulty, Type: task.Type, DueDate: task.DueDate, CreatedBy: task.CreatedBy,
 			Archived: &archived}
-		_, err := m.UpdateTask(update)
-		fmt.Println(err)
+		_, _ = m.UpdateTask(update)
 	}
 	return nil
 }
