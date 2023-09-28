@@ -17,6 +17,7 @@ var uiBoardsManager = managers.UiBoardsManager{}
 var menusManager managers.MenusManager
 var buttonBarViewManager managers.ButtonBarViewManager
 var actionsViewManager managers.ActionsViewManager
+var updateTaskManager managers.UpdateTaskManager
 
 func init() {
 	gotenv.Load()
@@ -24,7 +25,8 @@ func init() {
 	uiTasksManager = managers.UiTasksManager{ApiManager: apiManager}
 	historyViewManager := managers.HistoryViewManager{ApiManager: apiManager}
 	buttonBarViewManager = managers.ButtonBarViewManager{ApiManager: apiManager}
-	actionsViewManager = managers.ActionsViewManager{ApiManager: apiManager}
+	updateTaskManager = managers.UpdateTaskManager{ApiManager: apiManager}
+	actionsViewManager = managers.ActionsViewManager{ApiManager: apiManager, UpdateTaskManager: updateTaskManager}
 
 	menusManager = managers.MenusManager{ApiManager: apiManager,
 		UiTasksManager: uiTasksManager, HistoryViewManager: historyViewManager,

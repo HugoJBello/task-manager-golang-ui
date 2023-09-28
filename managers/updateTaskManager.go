@@ -62,26 +62,30 @@ func (m *UpdateTaskManager) GenerateUpdateTaskForm(app *tview.Application, pages
 			task.TaskBody = text
 		}).
 		AddButton("Save", func() {
-			go func() {
-				if task.Id != 0 {
-					m.UpdateTaskChanges(*task)
-				} else {
-					m.CreateTaskChanges(*task)
-				}
-				app.Stop()
-				*updatedSelectedBoard <- task.BoardId
-			}()
-			pages.SwitchToPage("list")
-			pages.RemovePage("modal")
-
+			m.RefreshAndClose(app, pages, task, updatedSelectedBoard)
 		}).
 		AddButton("Quit", func() {
-			pages.SwitchToPage("list")
-			pages.RemovePage("modal")
+			m.RefreshAndClose(app, pages, task, updatedSelectedBoard)
 		})
 
-	return form, nil
+	frame := tview.NewFrame(form).SetBorders(2, 2, 2, 2, 4, 4)
+	return frame, nil
 
+}
+
+func (m *UpdateTaskManager) RefreshAndClose(app *tview.Application, pages *tview.Pages, task *models.Task, updatedSelectedBoard *chan string) {
+	go func() {
+		if task.Id != 0 {
+			m.UpdateTaskChanges(*task)
+		} else {
+			m.CreateTaskChanges(*task)
+		}
+		app.Stop()
+		*updatedSelectedBoard <- task.BoardId
+	}()
+	pages.RemovePage("modal")
+
+	pages.SwitchToPage("tasks_board")
 }
 
 func (m *UpdateTaskManager) UpdateTaskChanges(task models.Task) {

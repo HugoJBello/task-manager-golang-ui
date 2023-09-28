@@ -13,7 +13,7 @@ type UiTasksManager struct {
 	ApiManager ApiManager
 }
 
-func (m *UiTasksManager) GetTasksListUi(app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) (taskLists []tview.Primitive, err error) {
+func (m *UiTasksManager) GetTasksListUi(app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) (taskLists []tview.Primitive, err error) {
 
 	tasks := globalAppState.TasksInBoard
 	tasksStatusMap := m.organizeTasksUsingStatus(*tasks)
@@ -24,12 +24,12 @@ func (m *UiTasksManager) GetTasksListUi(app *tview.Application, updatedSelectedB
 
 	sort.Strings(statuses)
 
-	taskLists, err = m.generateFrameListsFromTasks(tasksStatusMap, statuses, app, updatedSelectedBoard, globalAppState)
+	taskLists, err = m.generateFrameListsFromTasks(pages, tasksStatusMap, statuses, app, updatedSelectedBoard, globalAppState)
 	return taskLists, err
 
 }
 
-func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][]models.Task, statuses []string, app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) ([]tview.Primitive, error) {
+func (m *UiTasksManager) generateFrameListsFromTasks(pages *tview.Pages, tasksStatusMap map[string][]models.Task, statuses []string, app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) ([]tview.Primitive, error) {
 
 	updateTaskManager := UpdateTaskManager{ApiManager: m.ApiManager}
 
@@ -39,13 +39,11 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 
 	globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", Priority: &priority, Dificulty: &dificulty, TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
 	for _, status := range statuses {
-		pages := tview.NewPages()
 		tasks := tasksStatusMap[status]
 
 		list := generateListFromTasks(&tasks, pages, updatedSelectedBoard, globalAppState, status)
 
 		list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-
 			//if list.HasFocus() && *globalAppState.FocusedElement != 0 {
 			if list.HasFocus() {
 				current := list.GetCurrentItem()
@@ -56,9 +54,10 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 				task := tasks[current]
 				globalAppState.SelectedTask = &task
 
-				form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)
-				pages.RemovePage("modal")
-				pages.AddPage("modal", form, true, false)
+				if event.Key() == tcell.KeyEnter && *globalAppState.FocusedElement != 0 {
+					form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)
+					pages.AddPage("modal", form, true, true)
+				}
 
 				if event.Key() == tcell.KeyCtrlU && *globalAppState.FocusedElement != 0 {
 					m.updateNewTaskWithStatus("doing", task, app, updatedSelectedBoard)
@@ -71,7 +70,6 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 				} else if event.Key() == tcell.KeyCtrlN && *globalAppState.FocusedElement != 0 {
 					globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
 					form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)
-					pages.RemovePage("modal")
 					pages.AddPage("modal", form, true, true)
 				}
 
@@ -79,9 +77,7 @@ func (m *UiTasksManager) generateFrameListsFromTasks(tasksStatusMap map[string][
 			return event
 		})
 
-		pages.AddPage("list", list, true, true)
-
-		inputs = append(inputs, pages)
+		inputs = append(inputs, list)
 	}
 
 	//AddCycleFocus(flex, app, inputs)

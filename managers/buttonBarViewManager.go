@@ -1,7 +1,6 @@
 package managers
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/HugoJBello/task-manager-golang-ui/models"
@@ -16,7 +15,6 @@ type ButtonBarViewManager struct {
 func (m *ButtonBarViewManager) CreateButtonBarWithPoints(globalAppState *models.GlobalAppState) *tview.Frame {
 	boardId := globalAppState.SelectedBoardId
 	pointsReport, _ := m.ApiManager.GetPointsCurrentWeek(*boardId)
-	fmt.Println("*******", pointsReport)
 	lowerBarMenu := tview.NewFrame(tview.NewBox()).
 		SetBorders(0, 0, 0, 0, 4, 4).
 		AddText(m.PointsCurrentWeekText((*pointsReport)[0]), true, tview.AlignLeft, tcell.ColorWhite).

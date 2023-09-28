@@ -21,7 +21,7 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	tasksInBoard, _ := m.ApiManager.GetTasksInBoard(*globalAppState.SelectedBoardId)
 	globalAppState.TasksInBoard = tasksInBoard
 
-	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, updatedSelectedBoard, globalAppState)
+	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, pages, updatedSelectedBoard, globalAppState)
 
 	selectedSideMenu := (*globalAppState.SelectedStatus) == "none"
 	tasksWithSideMenuflex := tview.NewFlex().
