@@ -1,6 +1,8 @@
 package managers
 
 import (
+	"fmt"
+
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -19,12 +21,11 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	tasksInBoard, _ := m.ApiManager.GetTasksInBoard(*globalAppState.SelectedBoardId)
 	globalAppState.TasksInBoard = tasksInBoard
 
-	i := 0
-	globalAppState.FocusedElement = &i
 	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, updatedSelectedBoard, globalAppState)
 
+	selectedSideMenu := (*globalAppState.SelectedStatus) == "none"
 	tasksWithSideMenuflex := tview.NewFlex().
-		AddItem(listBoards, 18, 0, true)
+		AddItem(listBoards, 18, 0, selectedSideMenu)
 
 	tasksFlex := tview.NewFlex()
 
@@ -33,18 +34,20 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 	}
 
 	for index, _ := range tasksList {
-		tasksFlex.AddItem(tasksList[index], 0, 1, true)
+		selected := (*globalAppState.SelectedStatus) == globalAppState.Statuses[index]
+		fmt.Println(selected, globalAppState.Statuses[index], *globalAppState.SelectedStatus)
+		tasksFlex.AddItem(tasksList[index], 0, 1, selected)
 	}
 
-	tasksWithSideMenuflex.AddItem(tasksFlex, 0, 3, false)
+	tasksWithSideMenuflex.AddItem(tasksFlex, 0, 3, true)
 
 	historicList := m.HistoryViewManager.AddHistoryPage(app, pages, globalAppState)
 
-	pages.AddPage("historic", historicList, true, true)
+	pages.AddPage("historic", historicList, true, false)
 
-	actionsList := m.ActionsViewManager.AddActionsPage(app, pages,updatedSelectedBoard, globalAppState)
+	actionsList := m.ActionsViewManager.AddActionsPage(app, pages, updatedSelectedBoard, globalAppState)
 
-	pages.AddPage("actions", actionsList, true, true)
+	pages.AddPage("actions", actionsList, true, false)
 
 	pages.AddPage("tasks_board", tasksWithSideMenuflex, true, true)
 
@@ -96,6 +99,16 @@ func CycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool
 		}
 		app.SetFocus(elements[i])
 		globalAppState.FocusedElement = &i
+
+		var selected string = "doing"
+
+		if i == 0 {
+			selected = "none"
+		} else {
+			selected = globalAppState.Statuses[i-1]
+		}
+
+		globalAppState.SelectedStatus = &selected
 		return
 	}
 }

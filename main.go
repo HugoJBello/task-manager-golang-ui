@@ -35,7 +35,9 @@ func init() {
 func main() {
 	boards, _ := apiManager.GetBoards()
 
-	globalAppState := models.GlobalAppState{Boards: boards}
+	selectedStatus := "none"
+	focusedElement := 0
+	globalAppState := models.GlobalAppState{Boards: boards, SelectedStatus: &selectedStatus, FocusedElement: &focusedElement, Statuses: models.Statuses}
 
 	updatedSelectedBoard := make(chan string)
 

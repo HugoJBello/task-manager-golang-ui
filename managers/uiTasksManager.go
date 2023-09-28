@@ -13,20 +13,19 @@ type UiTasksManager struct {
 	ApiManager ApiManager
 }
 
-func (m *UiTasksManager) GetTasksListUi(app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) ([]tview.Primitive, error) {
+func (m *UiTasksManager) GetTasksListUi(app *tview.Application, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) (taskLists []tview.Primitive, err error) {
 
 	tasks := globalAppState.TasksInBoard
 	tasksStatusMap := m.organizeTasksUsingStatus(*tasks)
-	var statuses = make([]string, 0, len(tasksStatusMap))
+	statuses := make([]string, 0, len(tasksStatusMap))
 	for k := range tasksStatusMap {
 		statuses = append(statuses, k)
 	}
 
 	sort.Strings(statuses)
 
-	globalAppState.Statuses = &statuses
-
-	return m.generateFrameListsFromTasks(tasksStatusMap, statuses, app, updatedSelectedBoard, globalAppState)
+	taskLists, err = m.generateFrameListsFromTasks(tasksStatusMap, statuses, app, updatedSelectedBoard, globalAppState)
+	return taskLists, err
 
 }
 
