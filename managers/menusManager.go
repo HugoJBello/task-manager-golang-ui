@@ -1,8 +1,6 @@
 package managers
 
 import (
-	"fmt"
-
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -35,7 +33,6 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 
 	for index, _ := range tasksList {
 		selected := (*globalAppState.SelectedStatus) == globalAppState.Statuses[index]
-		fmt.Println(selected, globalAppState.Statuses[index], *globalAppState.SelectedStatus)
 		tasksFlex.AddItem(tasksList[index], 0, 1, selected)
 	}
 
