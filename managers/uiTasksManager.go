@@ -138,7 +138,7 @@ func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, updatedSele
 	})
 	list.SetHighlightFullLine(true)
 	if (*tasks)[0].Status == "doing" {
-		list.SetBackgroundColor(tcell.Color100)
+		list.SetBackgroundColor(tcell.ColorDarkSlateGray)
 	}
 	return list
 }
