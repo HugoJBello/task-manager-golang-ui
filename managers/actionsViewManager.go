@@ -14,6 +14,20 @@ func (m *ActionsViewManager) AddActionsPage(app *tview.Application, pages *tview
 
 	list := tview.NewList()
 
+	for index, _ := range *globalAppState.Boards {
+		br := (*globalAppState.Boards)[index]
+		list.AddItem(br.BoardTitle, br.BoardBody, GetRune(index), func() {
+			go func() {
+				app.Stop()
+				*updatedSelectedBoard <- br.BoardId
+			}()
+		})
+	}
+
+	list.AddItem("History", "Access history", 'h', func() {
+		pages.SwitchToPage("historic")
+	})
+
 	list.AddItem("Create New Task", "adds a new task", 'c', func() {
 		globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
 		form, _ := m.UpdateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)

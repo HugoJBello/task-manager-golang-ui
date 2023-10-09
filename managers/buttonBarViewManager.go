@@ -18,7 +18,7 @@ func (m *ButtonBarViewManager) CreateButtonBarWithPoints(globalAppState *models.
 	lowerBarMenu := tview.NewFrame(tview.NewBox()).
 		SetBorders(0, 0, 0, 0, 4, 4).
 		AddText(m.PointsCurrentWeekText((*pointsReport)[0]), true, tview.AlignLeft, tcell.ColorWhite).
-		AddText("_", true, tview.AlignCenter, tcell.ColorWhite).
+		AddText("Ctr+A -> actions", true, tview.AlignCenter, tcell.ColorWhite).
 		AddText("_", true, tview.AlignRight, tcell.ColorWhite)
 	return lowerBarMenu
 }

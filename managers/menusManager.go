@@ -14,16 +14,12 @@ type MenusManager struct {
 	ActionsViewManager   ActionsViewManager
 }
 
-func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState, horizontalView bool) {
+func (m *MenusManager) LoadMenus(app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState, horizontalView bool) {
 
 	tasksInBoard, _ := m.ApiManager.GetTasksInBoard(*globalAppState.SelectedBoardId)
 	globalAppState.TasksInBoard = tasksInBoard
 
 	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, pages, updatedSelectedBoard, globalAppState)
-
-	selectedSideMenu := (*globalAppState.SelectedStatus) == "none"
-	tasksWithSideMenuflex := tview.NewFlex().
-		AddItem(listBoards, 18, 0, selectedSideMenu)
 
 	tasksFlex := tview.NewFlex()
 
@@ -36,8 +32,6 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 		tasksFlex.AddItem(tasksList[index], 0, 1, selected)
 	}
 
-	tasksWithSideMenuflex.AddItem(tasksFlex, 0, 3, true)
-
 	historicList := m.HistoryViewManager.AddHistoryPage(app, pages, globalAppState)
 
 	pages.AddPage("historic", historicList, true, false)
@@ -46,14 +40,12 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 
 	pages.AddPage("actions", actionsList, true, false)
 
-	pages.AddPage("tasks_board", tasksWithSideMenuflex, true, true)
+	pages.AddPage("tasks_board", tasksFlex, true, true)
 
-	inputs := []tview.Primitive{
-		listBoards,
-	}
+	inputs := []tview.Primitive{}
 	inputs = append(inputs, tasksList...)
 
-	AddCycleFocus(tasksWithSideMenuflex, app, inputs, globalAppState)
+	AddCycleFocus(tasksFlex, app, inputs, globalAppState)
 
 	lowerBarFlex := tview.NewFlex().SetDirection(tview.FlexRow)
 
@@ -69,9 +61,9 @@ func (m *MenusManager) LoadMenus(listBoards *tview.List, app *tview.Application,
 
 func AddCycleFocus(flex *tview.Flex, app *tview.Application, inputs []tview.Primitive, globalAppState *models.GlobalAppState) {
 	flex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Key() == tcell.KeyCtrlSpace {
+		if event.Key() == tcell.KeyCtrlSpace || event.Key() == tcell.KeyCtrlK {
 			CycleFocus(app, inputs, false, globalAppState)
-		} else if event.Key() == tcell.KeyBacktab {
+		} else if event.Key() == tcell.KeyBacktab || event.Key() == tcell.KeyCtrlJ {
 			CycleFocus(app, inputs, true, globalAppState)
 		}
 		return event

@@ -37,7 +37,7 @@ func init() {
 func main() {
 	boards, _ := apiManager.GetBoards()
 
-	selectedStatus := "none"
+	selectedStatus := "doing"
 	focusedElement := 0
 	globalAppState := models.GlobalAppState{Boards: boards, SelectedStatus: &selectedStatus, FocusedElement: &focusedElement, Statuses: models.Statuses}
 
@@ -47,15 +47,14 @@ func main() {
 	pages := tview.NewPages()
 
 	fmt.Println(boards)
-	sideMenu, _ := uiBoardsManager.GetBoardsListUi(boards, app, pages, &globalAppState, &updatedSelectedBoard)
 
 	globalAppState.SelectedBoardId = &(*boards)[0].BoardId
-	menusManager.LoadMenus(sideMenu, app, pages, &updatedSelectedBoard, &globalAppState, false)
+	menusManager.LoadMenus(app, pages, &updatedSelectedBoard, &globalAppState, false)
 
 	for selected := range updatedSelectedBoard {
 		if selected != "none" {
 			globalAppState.SelectedBoardId = &selected
-			menusManager.LoadMenus(sideMenu, app, pages, &updatedSelectedBoard, &globalAppState, false)
+			menusManager.LoadMenus(app, pages, &updatedSelectedBoard, &globalAppState, false)
 		}
 		app.Stop()
 	}

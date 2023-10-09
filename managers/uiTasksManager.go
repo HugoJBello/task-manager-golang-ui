@@ -54,23 +54,25 @@ func (m *UiTasksManager) generateFrameListsFromTasks(pages *tview.Pages, tasksSt
 				task := tasks[current]
 				globalAppState.SelectedTask = &task
 
-				if event.Key() == tcell.KeyEnter && *globalAppState.FocusedElement != 0 {
+				if event.Key() == tcell.KeyEnter {
 					form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)
 					pages.AddPage("modal", form, true, true)
 				}
 
-				if event.Key() == tcell.KeyCtrlU && *globalAppState.FocusedElement != 0 {
+				if event.Key() == tcell.KeyCtrlU {
 					m.updateNewTaskWithStatus("doing", task, app, updatedSelectedBoard)
-				} else if event.Key() == tcell.KeyCtrlD && *globalAppState.FocusedElement != 0 {
+				} else if event.Key() == tcell.KeyCtrlD {
 					m.updateNewTaskWithStatus("done", task, app, updatedSelectedBoard)
-				} else if event.Key() == tcell.KeyCtrlB && *globalAppState.FocusedElement != 0 {
+				} else if event.Key() == tcell.KeyCtrlB {
 					m.updateNewTaskWithStatus("blocked", task, app, updatedSelectedBoard)
-				} else if event.Key() == tcell.KeyDelete && *globalAppState.FocusedElement != 0 {
+				} else if event.Key() == tcell.KeyDelete {
 					m.deleteTask(task, app, updatedSelectedBoard)
-				} else if event.Key() == tcell.KeyCtrlN && *globalAppState.FocusedElement != 0 {
+				} else if event.Key() == tcell.KeyCtrlN {
 					globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
 					form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)
 					pages.AddPage("modal", form, true, true)
+				} else if event.Key() == tcell.KeyCtrlA {
+					pages.SwitchToPage("actions")
 				}
 
 			}
