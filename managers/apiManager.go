@@ -202,7 +202,7 @@ func (m *ApiManager) GetPointsCurrentWeek(boardId string) (*[]models.PointsRepor
 	var pointsReportResponse models.PointsReportResponse
 
 	json.Unmarshal(bodyGetResp, &pointsReportResponse)
-
+	fmt.Println(pointsReportResponse.Data)
 	return &pointsReportResponse.Data, nil
 }
 

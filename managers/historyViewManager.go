@@ -25,6 +25,7 @@ func (m *HistoryViewManager) AddHistoryPage(app *tview.Application, pages *tview
 
 	list.AddItem("Quit", "Press to exit", 'q', func() {
 		go func() {
+			globalAppState.RefreshBlocked = false
 			pages.SwitchToPage("tasks_board")
 		}()
 	})

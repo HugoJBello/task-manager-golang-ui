@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/HugoJBello/task-manager-golang-ui/managers"
 	"github.com/HugoJBello/task-manager-golang-ui/models"
@@ -18,6 +19,7 @@ var menusManager managers.MenusManager
 var buttonBarViewManager managers.ButtonBarViewManager
 var actionsViewManager managers.ActionsViewManager
 var updateTaskManager managers.UpdateTaskManager
+var timerManager managers.TimerManager
 
 func init() {
 	gotenv.Load()
@@ -27,6 +29,7 @@ func init() {
 	buttonBarViewManager = managers.ButtonBarViewManager{ApiManager: apiManager}
 	updateTaskManager = managers.UpdateTaskManager{ApiManager: apiManager}
 	actionsViewManager = managers.ActionsViewManager{ApiManager: apiManager, UpdateTaskManager: updateTaskManager}
+	timerManager = managers.TimerManager{}
 
 	menusManager = managers.MenusManager{ApiManager: apiManager,
 		UiTasksManager: uiTasksManager, HistoryViewManager: historyViewManager,
@@ -39,11 +42,16 @@ func main() {
 
 	selectedStatus := "doing"
 	focusedElement := 0
-	globalAppState := models.GlobalAppState{Boards: boards, SelectedStatus: &selectedStatus, FocusedElement: &focusedElement, Statuses: models.Statuses}
+	refreshApp := make(chan string)
+	globalAppState := models.GlobalAppState{RefreshApp: &refreshApp, Boards: boards, SelectedStatus: &selectedStatus, FocusedElement: &focusedElement, Statuses: models.Statuses,
+		CurrentTime: time.Now(), RefreshBlocked: false}
 
 	updatedSelectedBoard := make(chan string)
 
 	app := tview.NewApplication()
+
+	go timerManager.SetTimer(app, &globalAppState)
+
 	pages := tview.NewPages()
 
 	fmt.Println(boards)
@@ -51,12 +59,25 @@ func main() {
 	globalAppState.SelectedBoardId = &(*boards)[0].BoardId
 	menusManager.LoadMenus(app, pages, &updatedSelectedBoard, &globalAppState, false)
 
-	for selected := range updatedSelectedBoard {
-		if selected != "none" {
-			globalAppState.SelectedBoardId = &selected
-			menusManager.LoadMenus(app, pages, &updatedSelectedBoard, &globalAppState, false)
+	go func() {
+		for selected := range updatedSelectedBoard {
+			fmt.Println("updated selected board")
+			if selected != "none" {
+				globalAppState.SelectedBoardId = &selected
+				menusManager.LoadMenus(app, pages, &updatedSelectedBoard, &globalAppState, false)
+			}
+			app.Stop()
 		}
-		app.Stop()
-	}
+	}()
+
+	go func() {
+		for refresh := range *globalAppState.RefreshApp {
+			fmt.Println("-----", refresh)
+			menusManager.LoadMenus(app, pages, &updatedSelectedBoard, &globalAppState, false)
+
+		}
+	}()
+
+	<-(chan int)(nil)
 
 }

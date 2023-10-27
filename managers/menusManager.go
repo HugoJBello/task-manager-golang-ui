@@ -1,6 +1,8 @@
 package managers
 
 import (
+	"fmt"
+
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -19,7 +21,7 @@ func (m *MenusManager) LoadMenus(app *tview.Application, pages *tview.Pages, upd
 	tasksInBoard, _ := m.ApiManager.GetTasksInBoard(*globalAppState.SelectedBoardId)
 	globalAppState.TasksInBoard = tasksInBoard
 
-	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, pages, updatedSelectedBoard, globalAppState)
+	tasksList, _ := m.UiTasksManager.GetTasksListUi(app, pages, globalAppState)
 
 	tasksFlex := tview.NewFlex()
 
@@ -28,21 +30,23 @@ func (m *MenusManager) LoadMenus(app *tview.Application, pages *tview.Pages, upd
 	}
 
 	for index, _ := range tasksList {
-		selected := (*globalAppState.SelectedStatus) == globalAppState.Statuses[index]
-		tasksFlex.AddItem(tasksList[index], 0, 1, selected)
+		selected := (*globalAppState.SelectedStatus) == tasksList[index].GetTitle()
+		fmt.Println(*globalAppState.SelectedStatus)
+		var primitive tview.Primitive = &tasksList[index]
+		tasksFlex.AddItem(primitive, 0, 1, selected)
 	}
 
 	historicList := m.HistoryViewManager.AddHistoryPage(app, pages, globalAppState)
 
 	pages.AddPage("historic", historicList, true, false)
 
-	actionsList := m.ActionsViewManager.AddActionsPage(app, pages, updatedSelectedBoard, globalAppState)
+	actionsList := m.ActionsViewManager.AddActionsPage(app, pages, globalAppState)
 
 	pages.AddPage("actions", actionsList, true, false)
 
 	pages.AddPage("tasks_board", tasksFlex, true, true)
 
-	inputs := []tview.Primitive{}
+	inputs := []tview.List{}
 	inputs = append(inputs, tasksList...)
 
 	AddCycleFocus(tasksFlex, app, inputs, globalAppState)
@@ -59,7 +63,7 @@ func (m *MenusManager) LoadMenus(app *tview.Application, pages *tview.Pages, upd
 	}
 }
 
-func AddCycleFocus(flex *tview.Flex, app *tview.Application, inputs []tview.Primitive, globalAppState *models.GlobalAppState) {
+func AddCycleFocus(flex *tview.Flex, app *tview.Application, inputs []tview.List, globalAppState *models.GlobalAppState) {
 	flex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlSpace || event.Key() == tcell.KeyCtrlK {
 			CycleFocus(app, inputs, false, globalAppState)
@@ -71,7 +75,7 @@ func AddCycleFocus(flex *tview.Flex, app *tview.Application, inputs []tview.Prim
 	})
 }
 
-func CycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool, globalAppState *models.GlobalAppState) {
+func CycleFocus(app *tview.Application, elements []tview.List, reverse bool, globalAppState *models.GlobalAppState) {
 	for i, el := range elements {
 		if !el.HasFocus() {
 			continue
@@ -86,7 +90,8 @@ func CycleFocus(app *tview.Application, elements []tview.Primitive, reverse bool
 			i = i + 1
 			i = i % len(elements)
 		}
-		app.SetFocus(elements[i])
+		var primitive tview.Primitive = &elements[i]
+		app.SetFocus(primitive)
 		globalAppState.FocusedElement = &i
 
 		var selected string = "doing"

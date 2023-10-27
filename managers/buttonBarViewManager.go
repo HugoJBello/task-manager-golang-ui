@@ -14,12 +14,13 @@ type ButtonBarViewManager struct {
 
 func (m *ButtonBarViewManager) CreateButtonBarWithPoints(globalAppState *models.GlobalAppState) *tview.Frame {
 	boardId := globalAppState.SelectedBoardId
+	globalAppState.UpdateDisplayTime()
 	pointsReport, _ := m.ApiManager.GetPointsCurrentWeek(*boardId)
 	lowerBarMenu := tview.NewFrame(tview.NewBox()).
 		SetBorders(0, 0, 0, 0, 4, 4).
 		AddText(m.PointsCurrentWeekText((*pointsReport)[0]), true, tview.AlignLeft, tcell.ColorWhite).
 		AddText("Ctr+A -> actions", true, tview.AlignCenter, tcell.ColorWhite).
-		AddText("_", true, tview.AlignRight, tcell.ColorWhite)
+		AddText(globalAppState.DisplayCurrentTime, true, tview.AlignRight, tcell.ColorWhite)
 	return lowerBarMenu
 }
 

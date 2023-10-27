@@ -12,7 +12,7 @@ type UpdateTaskManager struct {
 	ApiManager ApiManager
 }
 
-func (m *UpdateTaskManager) GenerateUpdateTaskForm(app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) (tview.Primitive, error) {
+func (m *UpdateTaskManager) GenerateUpdateTaskForm(app *tview.Application, pages *tview.Pages, globalAppState *models.GlobalAppState) (tview.Primitive, error) {
 
 	var task = globalAppState.SelectedTask
 
@@ -62,10 +62,12 @@ func (m *UpdateTaskManager) GenerateUpdateTaskForm(app *tview.Application, pages
 			task.TaskBody = text
 		}).
 		AddButton("Save", func() {
-			m.RefreshAndClose(app, pages, task, updatedSelectedBoard)
+			*globalAppState.SelectedStatus = task.Status
+			m.RefreshAndClose(app, globalAppState, pages, task)
 		}).
 		AddButton("Quit", func() {
-			m.RefreshAndClose(app, pages, task, updatedSelectedBoard)
+			pages.RemovePage("modal")
+			pages.SwitchToPage("tasks_board")
 		})
 
 	frame := tview.NewFrame(form).SetBorders(2, 2, 2, 2, 4, 4)
@@ -73,15 +75,17 @@ func (m *UpdateTaskManager) GenerateUpdateTaskForm(app *tview.Application, pages
 
 }
 
-func (m *UpdateTaskManager) RefreshAndClose(app *tview.Application, pages *tview.Pages, task *models.Task, updatedSelectedBoard *chan string) {
+func (m *UpdateTaskManager) RefreshAndClose(app *tview.Application, globalAppState *models.GlobalAppState, pages *tview.Pages, task *models.Task) {
 	go func() {
 		if task.Id != 0 {
 			m.UpdateTaskChanges(*task)
 		} else {
 			m.CreateTaskChanges(*task)
 		}
+		globalAppState.RefreshBlocked = false
+
 		app.Stop()
-		*updatedSelectedBoard <- task.BoardId
+		*globalAppState.RefreshApp <- task.BoardId
 	}()
 	pages.RemovePage("modal")
 

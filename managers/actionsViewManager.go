@@ -10,7 +10,7 @@ type ActionsViewManager struct {
 	UpdateTaskManager UpdateTaskManager
 }
 
-func (m *ActionsViewManager) AddActionsPage(app *tview.Application, pages *tview.Pages, updatedSelectedBoard *chan string, globalAppState *models.GlobalAppState) *tview.Frame {
+func (m *ActionsViewManager) AddActionsPage(app *tview.Application, pages *tview.Pages, globalAppState *models.GlobalAppState) *tview.Frame {
 
 	list := tview.NewList()
 
@@ -19,18 +19,20 @@ func (m *ActionsViewManager) AddActionsPage(app *tview.Application, pages *tview
 		list.AddItem(br.BoardTitle, br.BoardBody, GetRune(index), func() {
 			go func() {
 				app.Stop()
-				*updatedSelectedBoard <- br.BoardId
+				*globalAppState.RefreshApp <- br.BoardId
 			}()
 		})
 	}
 
 	list.AddItem("History", "Access history", 'h', func() {
+		globalAppState.RefreshBlocked = true
 		pages.SwitchToPage("historic")
 	})
 
 	list.AddItem("Create New Task", "adds a new task", 'c', func() {
+		globalAppState.RefreshBlocked = true
 		globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
-		form, _ := m.UpdateTaskManager.GenerateUpdateTaskForm(app, pages, updatedSelectedBoard, globalAppState)
+		form, _ := m.UpdateTaskManager.GenerateUpdateTaskForm(app, pages, globalAppState)
 		pages.AddPage("modal", form, true, true)
 	})
 
@@ -49,7 +51,7 @@ func (m *ActionsViewManager) AddActionsPage(app *tview.Application, pages *tview
 		m.ApiManager.ArchiveTasks(&filteredTasks)
 		go func() {
 			app.Stop()
-			*updatedSelectedBoard <- (*tasks)[0].BoardId
+			*globalAppState.RefreshApp <- (*tasks)[0].BoardId
 		}()
 
 		pages.SwitchToPage("tasks_board")
