@@ -42,23 +42,19 @@ func (m *UiTasksManager) generateFrameListsFromTasks(pages *tview.Pages, tasksSt
 	for _, status := range statuses {
 		tasks := tasksStatusMap[status]
 
-		list := generateListFromTasks(&tasks, pages, globalAppState, status)
+		list := m.generateListFromTasks(&tasks, tasksStatusMap, pages, globalAppState, status, app)
 
 		list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 			//if list.HasFocus() && *globalAppState.FocusedElement != 0 {
 			if list.HasFocus() {
 				current := list.GetCurrentItem()
 				status = list.GetTitle()
+
 				//statuses := *globalAppState.Statuses
 				//status := statuses[*globalAppState.FocusedElement-1]
 				tasks := tasksStatusMap[status]
 				task := tasks[current]
 				globalAppState.SelectedTask = &task
-
-				if event.Key() == tcell.KeyEnter {
-					form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, globalAppState)
-					pages.AddPage("modal", form, true, true)
-				}
 
 				if event.Key() == tcell.KeyCtrlU {
 					m.updateNewTaskWithStatus("doing", task, globalAppState, app)
@@ -81,7 +77,7 @@ func (m *UiTasksManager) generateFrameListsFromTasks(pages *tview.Pages, tasksSt
 			return event
 		})
 
-		inputs = append(inputs, list)
+		inputs = append(inputs, *list)
 	}
 	return inputs, nil
 }
@@ -109,7 +105,9 @@ func (m *UiTasksManager) deleteTask(task models.Task, globalAppState *models.Glo
 	}()
 }
 
-func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, globalAppState *models.GlobalAppState, title string) tview.List {
+func (m *UiTasksManager) generateListFromTasks(tasks *[]models.Task, tasksStatusMap map[string][]models.Task, pages *tview.Pages, globalAppState *models.GlobalAppState, title string, app *tview.Application) *tview.List {
+	updateTaskManager := UpdateTaskManager{ApiManager: m.ApiManager}
+
 	list := tview.NewList()
 	for index, _ := range *tasks {
 		br := (*tasks)[index]
@@ -137,13 +135,22 @@ func generateListFromTasks(tasks *[]models.Task, pages *tview.Pages, globalAppSt
 	list.SetBorder(true).SetTitle(title)
 
 	list.SetSelectedFunc(func(index int, mainText string, secondaryText string, shortcut rune) {
-		//fmt.Println(index, shortcut)
+		current := index
+		status := list.GetTitle()
+
+		tasks := tasksStatusMap[status]
+		task := tasks[current]
+		globalAppState.SelectedTask = &task
+
+		form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, globalAppState)
+		pages.AddPage("modal", form, true, true)
+
 	})
 	list.SetHighlightFullLine(true)
 	if (*tasks)[0].Status == "doing" {
 		list.SetBackgroundColor(tcell.ColorDarkSlateGray)
 	}
-	return *list
+	return list
 }
 
 func (m *UiTasksManager) organizeTasksUsingStatus(tasks []models.Task) map[string][]models.Task {
