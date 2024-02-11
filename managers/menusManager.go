@@ -65,9 +65,9 @@ func (m *MenusManager) LoadMenus(app *tview.Application, pages *tview.Pages, upd
 
 func AddCycleFocus(flex *tview.Flex, app *tview.Application, inputs []tview.List, globalAppState *models.GlobalAppState) {
 	flex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Key() == tcell.KeyCtrlSpace || event.Key() == tcell.KeyCtrlK {
+		if event.Key() == tcell.KeyCtrlSpace || event.Key() == tcell.KeyCtrlL {
 			CycleFocus(app, inputs, false, globalAppState)
-		} else if event.Key() == tcell.KeyBacktab || event.Key() == tcell.KeyCtrlJ {
+		} else if event.Key() == tcell.KeyBacktab || event.Key() == tcell.KeyCtrlH {
 			CycleFocus(app, inputs, true, globalAppState)
 		}
 		return event

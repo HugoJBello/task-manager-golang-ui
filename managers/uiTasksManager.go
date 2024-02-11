@@ -53,6 +53,7 @@ func (m *UiTasksManager) generateFrameListsFromTasks(pages *tview.Pages, tasksSt
 				//statuses := *globalAppState.Statuses
 				//status := statuses[*globalAppState.FocusedElement-1]
 				tasks := tasksStatusMap[status]
+				if len(tasks)>0{
 				task := tasks[current]
 				globalAppState.SelectedTask = &task
 
@@ -64,7 +65,11 @@ func (m *UiTasksManager) generateFrameListsFromTasks(pages *tview.Pages, tasksSt
 					m.updateNewTaskWithStatus("blocked", task, globalAppState, app)
 				} else if event.Key() == tcell.KeyDelete {
 					m.deleteTask(task, globalAppState, app)
-				} else if event.Key() == tcell.KeyCtrlN {
+				}
+					
+				}
+
+				if event.Key() == tcell.KeyCtrlN {
 					globalAppState.SelectedTask = &models.Task{Id: 0, TaskId: "", TaskTitle: "", TaskBody: "", Tags: "", Status: "", BoardId: *globalAppState.SelectedBoardId}
 					form, _ := updateTaskManager.GenerateUpdateTaskForm(app, pages, globalAppState)
 					globalAppState.RefreshBlocked = true
@@ -72,7 +77,6 @@ func (m *UiTasksManager) generateFrameListsFromTasks(pages *tview.Pages, tasksSt
 				} else if event.Key() == tcell.KeyCtrlA {
 					pages.SwitchToPage("actions")
 				}
-
 			}
 			return event
 		})
@@ -109,6 +113,7 @@ func (m *UiTasksManager) generateListFromTasks(tasks *[]models.Task, tasksStatus
 	updateTaskManager := UpdateTaskManager{ApiManager: m.ApiManager}
 
 	list := tview.NewList()
+	if (len(*tasks)>0){
 	for index, _ := range *tasks {
 		br := (*tasks)[index]
 		var subtext = ""
@@ -131,6 +136,7 @@ func (m *UiTasksManager) generateListFromTasks(tasks *[]models.Task, tasksStatus
 			}
 		})
 	}
+	}
 
 	list.SetBorder(true).SetTitle(title)
 
@@ -147,7 +153,7 @@ func (m *UiTasksManager) generateListFromTasks(tasks *[]models.Task, tasksStatus
 
 	})
 	list.SetHighlightFullLine(true)
-	if (*tasks)[0].Status == "doing" {
+	if len(*tasks)>0 && (*tasks)[0].Status == "doing" {
 		list.SetBackgroundColor(tcell.ColorDarkSlateGray)
 	}
 	return list
@@ -155,6 +161,11 @@ func (m *UiTasksManager) generateListFromTasks(tasks *[]models.Task, tasksStatus
 
 func (m *UiTasksManager) organizeTasksUsingStatus(tasks []models.Task) map[string][]models.Task {
 	result := make(map[string][]models.Task)
+
+	result["doing"] = []models.Task{}
+	result["done"] = []models.Task{}
+	result["todo"] = []models.Task{}
+
 
 	for i := 0; i < len(tasks); i++ {
 		tk := tasks[i]
