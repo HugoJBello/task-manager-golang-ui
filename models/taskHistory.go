@@ -11,8 +11,10 @@ type TaskHistory struct {
 	OldStatus     string     `json:"OldStatus" bson:"OldStatus"`
 	NewStatus     string     `json:"NewStatus" bson:"NewStatus"`
 	BoardId       string     `json:"boardId" bson:"boardId"`
+	Week          int        `json:"week" bson:"week"`
 	Priority      *int       `json:"priority" bson:"priority"`
 	Dificulty     *int       `json:"dificulty" bson:"dificulty"`
+	PercentCompleted *float64  `json:"percentCompleted" bson:"percentCompleted"`
 	Type          *string    `json:"type" bson:"type"`
 	CreatedAt     *time.Time `json:"createdAt" bson:"createdAt"`
 	EditedAt      *time.Time `json:"editedAt" bson:"editedAt"`
@@ -30,12 +32,13 @@ type CreateTaskHistory struct {
 	BoardId       string     `json:"boardId" bson:"boardId"`
 	Priority      *int       `json:"priority" bson:"priority"`
 	Dificulty     *int       `json:"dificulty" bson:"dificulty"`
+	PercentCompleted *float64  `json:"percentCompleted" bson:"percentCompleted"`
 	Type          *string    `json:"type" bson:"type"`
 	DueDate       *time.Time `json:"dueDate" bson:"dueDate"`
 	CreatedBy     string     `json:"createdBy" bson:"createdBy"`
 }
 
 type TaskHistoryResponse struct {
-	Message string        `json:"message" bson:"message"`
+	message string        `json:"message" bson:"message"`
 	Data    []TaskHistory `json:"data" bson:"data"`
 }

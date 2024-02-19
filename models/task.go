@@ -1,3 +1,4 @@
+
 package models
 
 import "time"
@@ -12,6 +13,7 @@ type Task struct {
 	BoardId   string     `json:"boardId" bson:"boardId"`
 	Priority  *int       `json:"priority" bson:"priority"`
 	Dificulty *int       `json:"dificulty" bson:"dificulty"`
+	PercentCompleted *float64       `json:"percentCompleted" bson:"percentCompleted"`
 	Type      *string    `json:"type" bson:"type"`
 	Archived  *string    `json:"archived" bson:"archived"`
 	CreatedAt *time.Time `json:"createdAt" bson:"createdAt"`
@@ -29,6 +31,7 @@ type CreateTask struct {
 	BoardId   string     `json:"boardId" bson:"boardId"`
 	Priority  *int       `json:"priority" bson:"priority"`
 	Dificulty *int       `json:"dificulty" bson:"dificulty"`
+	PercentCompleted *float64       `json:"percentCompleted" bson:"percentCompleted"`
 	Type      *string    `json:"type" bson:"type"`
 	DueDate   *time.Time `json:"dueDate" bson:"dueDate"`
 	CreatedBy string     `json:"createdBy" bson:"createdBy"`

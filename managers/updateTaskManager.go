@@ -2,6 +2,7 @@ package managers
 
 import (
 	"strconv"
+	"fmt"
 
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 	"github.com/google/uuid"
@@ -24,12 +25,17 @@ func (m *UpdateTaskManager) GenerateUpdateTaskForm(app *tview.Application, pages
 
 	var dificulty = "1"
 	var priority = "1"
-
+	var percentCompleted = "0"
+	
 	if task.Dificulty != nil {
 		dificulty = strconv.Itoa(*task.Dificulty)
 	}
 	if task.Priority != nil {
 		priority = strconv.Itoa(*task.Priority)
+	}
+
+	if task.PercentCompleted!= nil {
+		percentCompleted = fmt.Sprintf("%.1f", *task.PercentCompleted)
 	}
 
 	form := tview.NewForm().
@@ -54,6 +60,14 @@ func (m *UpdateTaskManager) GenerateUpdateTaskForm(app *tview.Application, pages
 				priority = marks
 			}
 			task.Priority = &priority
+		}).
+		AddInputField("Percent Completed", percentCompleted, 20, nil, func(text string) {
+			marks, err := strconv.ParseFloat(text, 64)
+			var percentCompleted = 0.0
+			if err == nil {
+				percentCompleted = marks
+			}
+			task.PercentCompleted = &percentCompleted
 		}).
 		AddInputField("Tags", task.TaskBody, 20, nil, func(text string) {
 			task.Tags = text
@@ -94,7 +108,7 @@ func (m *UpdateTaskManager) RefreshAndClose(app *tview.Application, globalAppSta
 
 func (m *UpdateTaskManager) UpdateTaskChanges(task models.Task) {
 	createTask := models.CreateTask{TaskId: task.TaskId, TaskTitle: task.TaskTitle,
-		TaskBody: task.TaskBody, Tags: task.Tags, Status: task.Status, BoardId: task.BoardId, DueDate: task.DueDate, Priority: task.Priority, Dificulty: task.Dificulty}
+		TaskBody: task.TaskBody, Tags: task.Tags, Status: task.Status, PercentCompleted:task.PercentCompleted, BoardId: task.BoardId, DueDate: task.DueDate, Priority: task.Priority, Dificulty: task.Dificulty}
 	m.ApiManager.UpdateTask(createTask)
 }
 func (m *UpdateTaskManager) CreateTaskChanges(task models.Task) {
