@@ -117,17 +117,22 @@ func (m *UiTasksManager) generateListFromTasks(tasks *[]models.Task, tasksStatus
 	for index, _ := range *tasks {
 		br := (*tasks)[index]
 		var subtext = ""
-		if br.Dificulty != nil {
-			subtext = subtext + "[::bl] DIF: " + strconv.Itoa(*br.Dificulty) + "[-:-:-:-]"
-		} else {
-			subtext = subtext + "[::bl] DIF: 1[-:-:-:-]"
-		}
 		if br.Priority != nil {
-			subtext = subtext + " PRIO: " + strconv.Itoa(*br.Priority)
+			subtext = subtext + getPriorityText(*br.Priority)
 		} else {
 			subtext = subtext + " PRIO: 1"
 		}
+		
+		if br.Dificulty != nil {
+			subtext = subtext + " DIF: " + strconv.Itoa(*br.Dificulty) + "[-:-:-:-]"
+		} else {
+			subtext = subtext + " DIF: 1"
+		}
 
+		if br.PercentCompleted != nil {
+			subtext = subtext + getPercentCompletedText(*br.PercentCompleted)
+		}
+		
 		subtext = subtext + " - " + br.TaskBody
 		list.AddItem(br.TaskTitle, subtext, GetRune(index), func() {
 			globalAppState.RefreshBlocked = true
@@ -157,6 +162,27 @@ func (m *UiTasksManager) generateListFromTasks(tasks *[]models.Task, tasksStatus
 		list.SetBackgroundColor(tcell.ColorDarkSlateGray)
 	}
 	return list
+}
+
+func getPriorityText(priority int) string{
+	if (priority > 2) {
+		return "[::bl] PRIO: " + strconv.Itoa(priority) + "[-:-:-:-]"
+	} else {
+		return " PRIO: " + strconv.Itoa(priority) 
+	}
+}
+
+func getPercentCompletedText(percent float64) string{
+	var out = " ["
+	for i:=0; i<5; i++ {
+		if (percent > float64(i)*20 - 1){
+				out = out + "#" 
+		} else {
+			out = out + "_"
+		}
+	}
+	out = out + "] [-:-:-:-]"
+	return out
 }
 
 func (m *UiTasksManager) organizeTasksUsingStatus(tasks []models.Task) map[string][]models.Task {
