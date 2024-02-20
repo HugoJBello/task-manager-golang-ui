@@ -2,7 +2,7 @@ package managers
 
 import (
 	"strconv"
-
+	"fmt"
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 	"github.com/rivo/tview"
 )
@@ -45,6 +45,10 @@ func (m *HistoryViewManager) getHistorySubText(taskHistory models.TaskHistory) s
 	if taskHistory.Dificulty != nil {
 		dificulty = strconv.Itoa(*taskHistory.Dificulty)
 	}
+	var percent = "0"
+	if taskHistory.PercentCompleted != nil {
+		percent = fmt.Sprintf("%.1f", *taskHistory.PercentCompleted)
+	}
 
 	var priority = "1"
 	if taskHistory.Priority != nil {
@@ -53,5 +57,5 @@ func (m *HistoryViewManager) getHistorySubText(taskHistory models.TaskHistory) s
 
 	date := taskHistory.EditedAt.Format("2006-01-02 15:04:05")
 
-	return date + " DIF: " + dificulty + " PRIOR: " + priority
+	return date + " DIF: " + dificulty + " PRIOR: " + priority + " PERCENT: " + percent
 }
