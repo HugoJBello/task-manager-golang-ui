@@ -4,7 +4,7 @@ import "time"
 
 type PointsReport struct {
 	Week               int           `json:"week" bson:"week"`
-	Points             int           `json:"points" bson:"points"`
+	Points             float64       `json:"points" bson:"points"`
 	TasksSummingPoints []TaskHistory `json:"tasksSummingPoints" bson:"tasksSummingPoints"`
 	CreatedAt          *time.Time    `json:"editedAt" bson:"editedAt"`
 	BoardId            string        `json:"boardId" bson:"boardId"`

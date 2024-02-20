@@ -2,7 +2,7 @@ package managers
 
 import (
 	"strconv"
-
+	"fmt"
 	"github.com/HugoJBello/task-manager-golang-ui/models"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -27,5 +27,5 @@ func (m *ButtonBarViewManager) CreateButtonBarWithPoints(globalAppState *models.
 func (m *ButtonBarViewManager) PointsCurrentWeekText(pointsReport models.PointsReport) string {
 	points := pointsReport.Points
 	week := pointsReport.Week
-	return "WEEK: " + strconv.Itoa(week) + "  POINTS: " + strconv.Itoa(points)
+	return "WEEK: " + strconv.Itoa(week) + "  POINTS: " + fmt.Sprintf("%.1f", points)
 }
